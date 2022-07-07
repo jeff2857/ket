@@ -1,8 +1,10 @@
 use std::io::{self, Write, Stdout, stdout};
+use termion::color;
 use termion::event::Key;
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
 use termion::raw::RawTerminal;
+use termion::style;
 
 use crate::editor::Position;
 
@@ -21,7 +23,7 @@ impl Terminal {
     pub fn new() -> Result<Self, std::io::Error> {
         let size = termion::terminal_size()?;
         Ok(Self {
-            size: Size { width: size.0, height: size.1 },
+            size: Size { width: size.0, height: size.1.saturating_sub(2) },
             _stdout: stdout().into_raw_mode()?,
         })
     }
@@ -61,6 +63,24 @@ impl Terminal {
 
     pub fn cursor_show() {
         print!("{}", termion::cursor::Show);
+    }
+
+    pub fn set_bg_color(color: color::Rgb) {
+        //print!("{}", style::Invert);
+        print!("{}", color::Bg(color));
+    }
+
+    pub fn reset_bg_color() {
+        //print!("{}", style::Reset);
+        print!("{}", color::Bg(color::Reset));
+    }
+
+    pub fn set_fg_color(color: color::Rgb) {
+        print!("{}", color::Fg(color));
+    }
+
+    pub fn reset_fg_color() {
+        print!("{}", color::Fg(color::Reset));
     }
 }
 

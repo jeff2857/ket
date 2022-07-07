@@ -1,4 +1,5 @@
-use std::fs;
+use std::io::Write;
+use std::{fs, io};
 
 use crate::editor::Position;
 use crate::row::Row;
@@ -81,5 +82,17 @@ impl Document {
 
         let new_row = self.rows.get_mut(at.y).unwrap().split(at.x);
         self.rows.insert(at.y + 1, new_row);
+    }
+
+    pub fn save(&self) -> Result<(), io::Error> {
+        if let Some(file_name) = &self.file_name {
+            let mut file = fs::File::create(file_name)?;
+            for row in &self.rows {
+                file.write_all(row.as_bytes())?;
+                file.write_all(b"\n")?;
+            }
+        }
+
+        Ok(())
     }
 }
